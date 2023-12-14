@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:background="@drawable/gradient_lavender"
+tools:context=".GrocerySettingsActivity">
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_constraintBottom_toTopOf="@+id/navbar">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/tvSortBy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/eight"
+            android:layout_marginTop="@dimen/sixteen"
+            android:text="@string/sortby"
+            android:textSize="24sp" />
+
+        <RadioGroup
+            android:id="@+id/radioGroupSortBy"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/border_line"
+            app:layout_constraintTop_toBottomOf="@id/tvSortBy"
+            android:layout_marginStart="10dp">
+
+            <RadioButton
+                android:id="@+id/radioName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:text="@string/name"
+                android:textSize="@dimen/twentyfour" />
+
+            <RadioButton
+                android:id="@+id/radioCity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/twentyfour"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:text="@string/city" />
+
+            <RadioButton
+                android:id="@+id/radioIsFavorite"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:textSize="@dimen/twentyfour"
+                android:text="@string/isFavorite" />
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/tvSortOrder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sort_order"
+            android:layout_marginStart="@dimen/eight"
+            android:layout_marginTop="@dimen/sixteen"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/radioGroupSortBy"
+            android:textSize="24sp" />
+
+        <RadioGroup
+            android:id="@+id/radioGroupSortOrder"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            app:layout_constraintTop_toBottomOf="@id/tvSortOrder"
+            android:background="@drawable/border_line"
+            android:layout_marginStart="10dp">
+
+            <RadioButton
+                android:id="@+id/radioAscending"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:textSize="@dimen/twentyfour"
+                android:text="@string/ascending" />
+
+            <RadioButton
+                android:id="@+id/radioDescending"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:textSize="@dimen/twentyfour"
+                android:text="@string/descending" />
+
+        </RadioGroup>
+
+    </LinearLayout>
+</ScrollView>
+
+<include layout="@layout/navbar" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

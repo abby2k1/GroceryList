@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/border_line"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/tvName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:layout_marginStart="@dimen/sixteen"
+        android:layout_marginTop="@dimen/eight"
+        android:textColor="@color/blue"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvCity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:textColor="@color/rebeccapurple"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="@+id/tvName"
+        app:layout_constraintTop_toBottomOf="@+id/tvName" />
+    <CheckBox
+        android:id="@+id/chkFavorite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="0dp"
+        android:text="@string/favorite"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/imgPhoto" />
+
+
+
+    <ImageButton
+        android:id="@+id/imgPhoto"
+        android:layout_width="@dimen/photo_width"
+        android:layout_height="@dimen/photo_height"
+        android:layout_margin="@dimen/eight"
+        android:layout_marginEnd="@dimen/eight"
+        android:contentDescription="@string/grocery_image"
+        android:maxWidth="@dimen/eighty"
+        android:minWidth="@dimen/minmax"
+        android:minHeight="@dimen/minmax"
+        android:scaleType="fitCenter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/photoicon" />
+
+    <Button
+        android:id="@+id/btnDelete"
+        android:layout_width="wrap_content"
+        android:layout_height="100px"
+        android:text="@string/delete"
+        android:textColor="@color/white"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toStartOf="@id/imgPhoto"
+        app:layout_constraintTop_toTopOf="@id/tvName" />
+</androidx.constraintlayout.widget.ConstraintLayout>
