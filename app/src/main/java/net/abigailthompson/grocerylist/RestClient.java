@@ -44,13 +44,8 @@ public class RestClient {
                                 JSONObject item = items.getJSONObject(i);
                                 Grocery grocery = new Grocery();
                                 grocery.setId(item.getInt("id"));
-                                grocery.setName(item.getString("name"));
-                                grocery.setCity(item.getString("city"));
-                                grocery.setCellphone(item.getString("cellNumber"));
-                                grocery.setRating((float) item.getDouble("rating"));
-                                grocery.setIsfavorite(item.getBoolean("isFavorite"));
-                                grocery.setLatitude(item.getDouble("latitude"));
-                                grocery.setLongitude(item.getDouble("longitude"));
+                                grocery.setName(item.getString("description"));
+                                grocery.setIsInCart(item.getBoolean("isInCart"));
 
                                 String jsonPhoto = item.getString("photo");
 
@@ -132,12 +127,8 @@ public class RestClient {
 
             object.put("id", grocery.getId());
             object.put("name", grocery.getName());
-            object.put("city", grocery.getCity());
-            object.put("rating", grocery.getRating());
-            object.put("cellNumber", grocery.getCellphone());
-            object.put("isFavorite", grocery.getIsfavorite());
-            object.put("latitude", grocery.getLatitude());
-            object.put("longitude", grocery.getLongitude());
+            object.put("isOnShoppingList", grocery.getIsOnShoppingList());
+            object.put("isInCart", grocery.getIsInCart());
 
             if(grocery.getPhoto() != null)
             {
@@ -157,19 +148,11 @@ public class RestClient {
             Log.d(TAG, "executeRequest: " + requestBody);
 
             JsonObjectRequest request = new JsonObjectRequest(method, url, object,
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            Log.d(TAG, "onResponse: " + response);
-                            // ALSO SUPER IMPORTANT
-                            volleyCallback.onSuccess(new ArrayList<Grocery>());
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.d(TAG, "onErrorResponse: " + error.getMessage());
-                }
-            })
+                    response -> {
+                        Log.d(TAG, "onResponse: " + response);
+                        // ALSO SUPER IMPORTANT
+                        volleyCallback.onSuccess(new ArrayList<Grocery>());
+                    }, error -> Log.d(TAG, "onErrorResponse: " + error.getMessage()))
             {
                 @Override
                 public byte[] getBody(){
@@ -197,48 +180,37 @@ public class RestClient {
         try {
             StringRequest stringRequest = new StringRequest(Request.Method.GET,
                     url,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            Log.d(TAG, "onResponse: " + response);
+                    response -> {
+                        Log.d(TAG, "onResponse: " + response);
 
-                            try {
-                                JSONObject object = new JSONObject(response);
-                                Grocery grocery = new Grocery();
-                                grocery.setId(object.getInt("id"));
-                                grocery.setName(object.getString("name"));
-                                grocery.setCity(object.getString("city"));
-                                grocery.setRating((float)object.getDouble("rating"));
-                                grocery.setCellphone(object.getString("cellNumber"));
-                                grocery.setIsfavorite(object.getBoolean("isFavorite"));
+                        try {
+                            JSONObject object = new JSONObject(response);
+                            Grocery grocery = new Grocery();
+                            grocery.setId(object.getInt("id"));
+                            grocery.setName(object.getString("name"));
+                            grocery.setIsOnShoppingList(object.getBoolean("isOnShoppingList"));
+                            grocery.setIsInCart(object.getBoolean("isInCart"));
 
-                                grocery.setLatitude(object.getDouble("latitude"));
-                                grocery.setLongitude(object.getDouble("longitude"));
+                            String jsonPhoto = object.getString("photo");
 
-                                String jsonPhoto = object.getString("photo");
-
-                                if(jsonPhoto != null)
-                                {
-                                    byte[] bytePhoto = null;
-                                    bytePhoto = Base64.decode(jsonPhoto, Base64.DEFAULT);
-                                    Bitmap bmp = BitmapFactory.decodeByteArray(bytePhoto, 0, bytePhoto.length);
-                                    grocery.setPhoto(bmp);
-                                }
-
-                                grocerys.add(grocery);
-
-                            } catch (Exception e) {
-                                throw new RuntimeException(e);
+                            if(jsonPhoto != null)
+                            {
+                                byte[] bytePhoto = null;
+                                bytePhoto = Base64.decode(jsonPhoto, Base64.DEFAULT);
+                                Bitmap bmp = BitmapFactory.decodeByteArray(bytePhoto, 0, bytePhoto.length);
+                                grocery.setPhoto(bmp);
                             }
-                            volleyCallback.onSuccess(grocerys);
+
+                            grocerys.add(grocery);
+
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
                         }
+                        volleyCallback.onSuccess(grocerys);
                     },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.d(TAG, "onErrorResponse: ");
-                            Log.d(TAG, "onErrorResponse: " + error.getMessage());
-                        }
+                    error -> {
+                        Log.d(TAG, "onErrorResponse: ");
+                        Log.d(TAG, "onErrorResponse: " + error.getMessage());
                     });
 
             // Important!!!

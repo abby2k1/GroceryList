@@ -30,9 +30,9 @@ public class GroceryListActivity extends AppCompatActivity {
 
     // String Sorters
     Comparator<Grocery> nameComparator = (c1, c2) -> c1.getName().compareTo(c2.getName());
-    Comparator<Grocery> cityComparator = (c1, c2) -> c1.getCity().compareTo(c2.getCity());
+
     // Boolean Sorter
-    Comparator<Grocery> isFavoriteComparator = (c1, c2) -> Boolean.compare(c2.getIsfavorite(), c1.getIsfavorite());
+    Comparator<Grocery> isInCartComparator = (c1, c2) -> Boolean.compare(c2.getIsInCart(), c1.getIsInCart());
 
     private View.OnClickListener onClickListener = view -> {
         RecyclerView.ViewHolder viewHolder = (RecyclerView.ViewHolder) view.getTag();
@@ -50,10 +50,10 @@ public class GroceryListActivity extends AppCompatActivity {
         int position = viewHolder.getAdapterPosition();
         int id = grocerys.get(position).getId();
         Grocery grocery = grocerys.get(position);
-        grocerys.get(position).setIsfavorite(b);
+        grocerys.get(position).setIsInCart(b);
         Log.d(TAG, "onCheckedChanged: " + grocerys.get(position).getName());
 
-        // grocery.setIsfavorite(b);
+        // grocery.setIsInCart(b);
 
         RestClient.execPutRequest(grocerys.get(position), TEAMSAPI + id, this,
                 VolleyCallback -> {
@@ -199,7 +199,7 @@ public class GroceryListActivity extends AppCompatActivity {
         Log.d(TAG, "readFromTextFile: After read");
         ArrayList<Grocery> grocerys = new ArrayList<Grocery>();
 
-        for(String s : strData)
+        /*for(String s : strData)
         {
             Log.d(TAG, "readFromTextFile: " + s);
             String[] data = s.split("\\|");
@@ -214,7 +214,7 @@ public class GroceryListActivity extends AppCompatActivity {
                     Double.parseDouble(data[7]),
                     Double.parseDouble(data[8])
             ));
-        }
+        }*/
         Log.d(TAG, "readFromTextFile: " + grocerys.size());
         return grocerys;
     }
@@ -250,14 +250,12 @@ public class GroceryListActivity extends AppCompatActivity {
         if (sortOrder.equals("ASC"))
         {
             if(sortBy.equals("name")) grocerys.sort(nameComparator);
-            if(sortBy.equals("city")) grocerys.sort(cityComparator);
-            if(sortBy.equals("isfavorite")) grocerys.sort(isFavoriteComparator);
+            if(sortBy.equals("isInCart")) grocerys.sort(isInCartComparator);
         }
         else
         {
             if(sortBy.equals("name")) grocerys.sort(nameComparator.reversed());
-            if(sortBy.equals("city")) grocerys.sort(cityComparator.reversed());
-            if(sortBy.equals("isfavorite")) grocerys.sort(isFavoriteComparator.reversed());
+            if(sortBy.equals("isInCart")) grocerys.sort(isInCartComparator.reversed());
         }
     }
 }

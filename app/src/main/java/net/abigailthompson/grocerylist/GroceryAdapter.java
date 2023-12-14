@@ -32,9 +32,8 @@ public class GroceryAdapter extends RecyclerView.Adapter {
 
     public class GroceryViewHolder extends RecyclerView.ViewHolder{
         private TextView tvName;
-        private TextView tvCity;
         private Button btnDelete;
-        private CheckBox chkFavorite;
+        private CheckBox chkInCart;
 
         private ImageButton imageButtonPhoto;
 
@@ -44,30 +43,25 @@ public class GroceryAdapter extends RecyclerView.Adapter {
         public GroceryViewHolder(@NonNull View itemView) {
             super(itemView);
             tvName = itemView.findViewById(R.id.tvName);
-            tvCity = itemView.findViewById(R.id.tvCity);
-            chkFavorite = itemView.findViewById(R.id.chkFavorite);
+            chkInCart = itemView.findViewById(R.id.chkInCart);
             imageButtonPhoto = itemView.findViewById(R.id.imgPhoto);
             btnDelete = itemView.findViewById(R.id.btnDelete);
 
             itemView.setTag(this);
             itemView.setOnClickListener(onItemClickListener);
-            chkFavorite.setTag(this);
-            chkFavorite.setOnCheckedChangeListener(onCheckedChangeListener);
+            chkInCart.setTag(this);
+            chkInCart.setOnCheckedChangeListener(onCheckedChangeListener);
         }
 
         public TextView getName()
         {
             return tvName;
         }
-        public TextView getCity()
-        {
-            return tvCity;
-        }
         public Button getBtnDelete() {return btnDelete; }
 
-        public CheckBox getChkFavorite()
+        public CheckBox getChkInCart()
         {
-            return chkFavorite;
+            return chkInCart;
         }
         public ImageButton getImageButtonPhoto()
         {
@@ -110,9 +104,7 @@ public class GroceryAdapter extends RecyclerView.Adapter {
 
         GroceryViewHolder groceryViewHolder = (GroceryViewHolder) holder;
         groceryViewHolder.getName().setText(grocery.getName());
-        groceryViewHolder.getCity().setText(grocery.getCity());
-        //groceryViewHolder.getImageButtonPhoto().setImageResource(grocery.getImgId());
-        groceryViewHolder.getChkFavorite().setChecked(grocery.getIsfavorite());
+        groceryViewHolder.getChkInCart().setChecked(grocery.getIsInCart());
 
         Bitmap groceryPhoto = grocery.getPhoto();
 
@@ -135,11 +127,11 @@ public class GroceryAdapter extends RecyclerView.Adapter {
             deleteItem(position);
         });
 
-        groceryViewHolder.getChkFavorite().setOnCheckedChangeListener((compoundButton, b) -> {
+        groceryViewHolder.getChkInCart().setOnCheckedChangeListener((compoundButton, b) -> {
             Log.d(TAG, "onCheckedChanged: " + b);
             onItemCheckedChangedListener.onCheckedChanged(compoundButton, b);
 
-            //grocery.setIsfavorite(b);
+            //grocery.setIsInCart(b);
             //GroceryDataSource ds = new GroceryDataSource(parentContext);
             //ds.open();
             //boolean didUpdate = ds.update(grocery) > 0;

@@ -18,26 +18,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/tvCity"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        android:textColor="@color/rebeccapurple"
-        android:textSize="24sp"
-        app:layout_constraintStart_toStartOf="@+id/tvName"
-        app:layout_constraintTop_toBottomOf="@+id/tvName" />
     <CheckBox
-        android:id="@+id/chkFavorite"
+        android:id="@+id/chkInCart"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="0dp"
-        android:text="@string/favorite"
+        android:text="@string/incart"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/imgPhoto" />
-
-
 
     <ImageButton
         android:id="@+id/imgPhoto"

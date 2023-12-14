@@ -15,13 +15,8 @@ public class GroceryDBHelper extends SQLiteOpenHelper {
     public static final String CREATE_TEAMS_SQL =
         "CREATE table tblGrocery (_id integer primary key autoincrement, " +
         "name text not null, " +
-        "city text not null, " +
-        "imgId integer not null, " +
-        "isFavorite bit, " +
-        "rating float, " +
-        "phone text not null, " +
-        "latitude float, " +
-        "longitude float);";
+        "isonshoppinglist bit, " +
+        "isInCart bit);";
 
     public GroceryDBHelper(@Nullable Context context,
                            @Nullable String name,

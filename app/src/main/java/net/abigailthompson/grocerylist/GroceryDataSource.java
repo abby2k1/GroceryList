@@ -36,10 +36,6 @@ public class GroceryDataSource {
     public void refreshData() {
         Log.d(TAG, "refreshData: ");
         ArrayList<Grocery> grocerys = new ArrayList<Grocery>();
-        grocerys.add(new Grocery(1, "Packers", "Green Bay", "9203551234", 4.5f, true, R.drawable.mapicon, 0.0,0.0));
-        grocerys.add(new Grocery(2, "Vikings", "Minneapolis", "11111111111", 2.5f, false, R.drawable.mapicon, 0.0,0.0));
-        grocerys.add(new Grocery(3, "Lions", "Detroit", "2222222222", 1.3f, true, R.drawable.mapicon, 0.0,0.0));
-        grocerys.add(new Grocery(4, "Bears", "Chicago", "3333333333", 2.0f, false, R.drawable.mapicon, 0.0,0.0));
 
         int results = 0;
         for(Grocery grocery: grocerys)
@@ -68,22 +64,16 @@ public class GroceryDataSource {
                 grocery = new Grocery();
                 grocery.setId(cursor.getInt(0));
                 grocery.setName(cursor.getString(1));
-                grocery.setCity(cursor.getString(2));
-                //grocery.setImgId(cursor.getInt(3));
 
-                Boolean fav = (cursor.getInt(4) == 1);
-                grocery.setIsfavorite(fav);
+                Boolean shoppingList = (cursor.getInt(2) == 1);
+                grocery.setIsOnShoppingList(shoppingList);
 
-                grocery.setRating(cursor.getFloat(5));
-                grocery.setCellphone(cursor.getString(6));
-
-                grocery.setLatitude(cursor.getDouble(7));
-                grocery.setLongitude(cursor.getDouble(8));
+                Boolean cart = (cursor.getInt(3) == 1);
+                grocery.setIsInCart(cart);
 
                 Log.d(TAG, "get: " + grocery.toString());
 
                 cursor.moveToNext();
-
             }
         }
         catch(Exception e)
@@ -110,26 +100,17 @@ public class GroceryDataSource {
                 grocery = new Grocery();
                 grocery.setId(cursor.getInt(0));
                 grocery.setName(cursor.getString(1));
-                grocery.setCity(cursor.getString(2));
-                //grocery.setImgId(cursor.getInt(3));
 
-                Boolean fav = (cursor.getInt(4) == 1);
-                grocery.setIsfavorite(fav);
+                Boolean shoppingList = (cursor.getInt(2) == 1);
+                grocery.setIsOnShoppingList(shoppingList);
 
-                grocery.setRating(cursor.getFloat(5));
-                grocery.setCellphone(cursor.getString(6));
-
-                grocery.setLatitude(cursor.getDouble(7));
-                grocery.setLongitude(cursor.getDouble(8));
-
-                //if(grocery.getImgId() == 0)
-                //    grocery.setImgId(R.drawable.photoicon);
+                Boolean cart = (cursor.getInt(3) == 1);
+                grocery.setIsInCart(cart);
 
                 grocerys.add(grocery);
                 Log.d(TAG, "get: " + grocery.toString());
 
                 cursor.moveToNext();
-
             }
         }
         catch(Exception e)
@@ -211,13 +192,8 @@ public class GroceryDataSource {
         try{
             ContentValues values = new ContentValues();
             values.put("name", grocery.getName());
-            values.put("city", grocery.getCity());
-            //values.put("imgId", grocery.getImgId());
-            values.put("isFavorite", grocery.getIsfavorite());
-            values.put("rating", grocery.getRating());
-            values.put("phone", grocery.getCellphone());
-            values.put("latitude", grocery.getLatitude());
-            values.put("longitude", grocery.getLongitude());
+            values.put("isOnShoppingList", grocery.getIsOnShoppingList());
+            values.put("isInCart", grocery.getIsInCart());
 
             String where = "_id = " + grocery.getId();
 
@@ -238,13 +214,8 @@ public class GroceryDataSource {
         try{
             ContentValues values = new ContentValues();
             values.put("name", grocery.getName());
-            values.put("city", grocery.getCity());
-            //values.put("imgId", grocery.getImgId());
-            values.put("isFavorite", grocery.getIsfavorite());
-            values.put("rating", grocery.getRating());
-            values.put("phone", grocery.getCellphone());
-            values.put("latitude", grocery.getLatitude());
-            values.put("longitude", grocery.getLongitude());
+            values.put("isOnShoppingList", grocery.getIsOnShoppingList());
+            values.put("isInCart", grocery.getIsInCart());
 
             rowsaffected = (int)database.insert("tblGrocery", null, values);
         }
@@ -254,6 +225,5 @@ public class GroceryDataSource {
             e.printStackTrace();
         }
         return rowsaffected;
-
     }
 }

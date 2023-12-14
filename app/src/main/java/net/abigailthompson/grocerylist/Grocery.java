@@ -8,12 +8,9 @@ import java.io.Serializable;
 public class Grocery implements Serializable {
     private int id;
     private String name;
-    private String city;
-    private String cellphone;
-    private float rating;
-    private boolean isfavorite;
-    //private int imgId;
-
+    private boolean isonshoppinglist;
+    private boolean isincart;
+    private Bitmap photo;
     public Bitmap getPhoto() {
         return photo;
     }
@@ -22,21 +19,14 @@ public class Grocery implements Serializable {
         this.photo = photo;
     }
 
-    private Bitmap photo;
-
     public Grocery() {
         this.name = "";
-        this.city = "";
-        this.cellphone = "";
-        this.rating = 0;
-        this.isfavorite = false;
-        //this.imgId = R.drawable.photoicon;
-        this.latitude = 0.0;
-        this.longitude = 0.0;
+        this.isonshoppinglist = false;
+        this.isincart = false;
     }
 
     public String getMarkerText() {
-        return name + ", " + city + " : " + rating;
+        return name;
     }
 
     @Override
@@ -47,23 +37,16 @@ public class Grocery implements Serializable {
                 ", city='" + city + '\'' +
                 ", cellphone='" + cellphone + '\'' +
                 ", rating=" + rating +
-                ", isfavorite=" + isfavorite +
+                ", isInCart=" + isInCart +
                 ", imgId=" + imgId +
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
                 '}';*/
         return String.valueOf(id) + '|' +
                 name + '|' +
-                city + '|' +
-                cellphone + '|' +
-                rating  + '|' +
-                isfavorite  + '|' +
-                //imgId  + '|' +
-                latitude  + '|' +
-                longitude;
+                isonshoppinglist  + '|' +
+                isincart;
     }
-
-    private Double latitude;
 
     public int getId() {
         return id;
@@ -81,107 +64,36 @@ public class Grocery implements Serializable {
         this.name = name;
     }
 
-    public String getCity() {
-        return city;
+    public boolean getIsOnShoppingList() {
+        return isonshoppinglist;
     }
 
-    public void setCity(String city) {
-        this.city = city;
+    public void setIsOnShoppingList(boolean isonshoppinglist) {
+        this.isonshoppinglist = isonshoppinglist;
     }
 
-    public String getCellphone() {
-        return cellphone;
+    public boolean getIsInCart() {
+        return isincart;
     }
 
-    public void setCellphone(String cellphone) {
-        this.cellphone = cellphone;
+    public void setIsInCart(boolean isincart) {
+        this.isincart = isincart;
     }
-
-    public float getRating() {
-        return rating;
-    }
-
-    public void setRating(float rating) {
-        this.rating = rating;
-    }
-
-    public boolean getIsfavorite() {
-        return isfavorite;
-    }
-
-    public void setIsfavorite(boolean isfavorite) {
-        this.isfavorite = isfavorite;
-    }
-
-    /*public int getImgId() {
-        return imgId;
-    }
-
-    public void setImgId(int imgId) {
-        this.imgId = imgId;
-    }*/
-
-    public Double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
-    }
-
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
-    }
-
-    private Double longitude;
 
     public Grocery(int id,
                    String name,
-                   String city,
-                   String cellphone,
-                   float rating,
-                   boolean isfavorite,
-                   int imgId,
-                   Double latitude,
-                   Double longitude) {
+                   boolean isonshoppinglist,
+                   boolean isincart) {
         this.id = id;
         this.name = name;
-        this.city = city;
-        this.cellphone = cellphone;
-        this.rating = rating;
-        this.isfavorite = isfavorite;
-        //this.imgId = imgId;
-        this.latitude = latitude;
-        this.longitude = longitude;
+        this.isonshoppinglist = isonshoppinglist;
+        this.isincart = isincart;
     }
 
     public void setControlText(int controlId, String value) {
         Log.d("Grocery", "setControlText: " + value);
         if (controlId == R.id.etName) {
             this.setName(value);
-        } else if (controlId == R.id.etCity) {
-            this.setCity(value);
-        } else if (controlId == R.id.editCell) {
-            this.setCellphone(value);
         }
-        /*
-        switch (controlId)
-        {
-            case R.id.etName:
-                Log.d("Grocery", "setControlText: " + value );
-                this.setName(value);
-                break;
-            case R.id.etCity:
-                this.setCity(value);
-                break;
-            case R.id.editCell:
-                this.setCellphone(value);
-                break;
-        }
-        */
     }
 }

@@ -53,13 +53,13 @@ tools:context=".GrocerySettingsActivity">
                 android:text="@string/city" />
 
             <RadioButton
-                android:id="@+id/radioIsFavorite"
+                android:id="@+id/radioIsInCart"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:textSize="@dimen/twentyfour"
-                android:text="@string/isFavorite" />
+                android:text="@string/isInCart" />
         </RadioGroup>
 
         <TextView

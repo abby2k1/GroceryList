@@ -30,35 +30,27 @@ public class GrocerySettingsActivity extends AppCompatActivity {
     private void initSortByClick() {
         RadioGroup rgSortBy = findViewById(R.id.radioGroupSortBy);
 
-        rgSortBy.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup radioGroup, int i) {
-                RadioButton rbName = findViewById(R.id.radioName);
-                RadioButton rbCity = findViewById(R.id.radioCity);
-                RadioButton rbIsFavorite = findViewById(R.id.radioIsFavorite);
+        rgSortBy.setOnCheckedChangeListener((radioGroup, i) -> {
+            RadioButton rbName = findViewById(R.id.radioName);
+            RadioButton rbIsInCart = findViewById(R.id.radioIsInCart);
 
-                String sortBy;
+            String sortBy;
 
-                if(rbName.isChecked())
-                {
-                    sortBy = "name";
-                }
-                else if(rbCity.isChecked())
-                {
-                    sortBy = "city";
-                }
-                else
-                {
-                    sortBy = "isfavorite";
-                }
-
-                getSharedPreferences("groceryspreferences",
-                        Context.MODE_PRIVATE)
-                        .edit()
-                        .putString("sortfield", sortBy)
-                        .apply();
-                Log.d(TAG, "onCheckedChanged: " + sortBy);
+            if(rbName.isChecked())
+            {
+                sortBy = "name";
             }
+            else
+            {
+                sortBy = "isInCart";
+            }
+
+            getSharedPreferences("groceryspreferences",
+                    Context.MODE_PRIVATE)
+                    .edit()
+                    .putString("sortfield", sortBy)
+                    .apply();
+            Log.d(TAG, "onCheckedChanged: " + sortBy);
         });
 
     }
@@ -66,30 +58,27 @@ public class GrocerySettingsActivity extends AppCompatActivity {
     private void initSortOrderClick() {
         RadioGroup rgSortOrder = findViewById(R.id.radioGroupSortOrder);
 
-        rgSortOrder.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup radioGroup, int i) {
-                RadioButton rbAscending = findViewById(R.id.radioAscending);
-                RadioButton rbDescending = findViewById(R.id.radioDescending);
+        rgSortOrder.setOnCheckedChangeListener((radioGroup, i) -> {
+            RadioButton rbAscending = findViewById(R.id.radioAscending);
+            RadioButton rbDescending = findViewById(R.id.radioDescending);
 
-                String sortOrder;
+            String sortOrder;
 
-                if(rbAscending.isChecked())
-                {
-                    sortOrder = "ASC";
-                }
-                else
-                {
-                    sortOrder = "DESC";
-                }
-
-                getSharedPreferences("groceryspreferences",
-                        Context.MODE_PRIVATE)
-                        .edit()
-                        .putString("sortorder", sortOrder)
-                        .apply();
-                Log.d(TAG, "onCheckedChanged: " + sortOrder);
+            if(rbAscending.isChecked())
+            {
+                sortOrder = "ASC";
             }
+            else
+            {
+                sortOrder = "DESC";
+            }
+
+            getSharedPreferences("groceryspreferences",
+                    Context.MODE_PRIVATE)
+                    .edit()
+                    .putString("sortorder", sortOrder)
+                    .apply();
+            Log.d(TAG, "onCheckedChanged: " + sortOrder);
         });
     }
     private void initSettings() {
@@ -101,14 +90,12 @@ public class GrocerySettingsActivity extends AppCompatActivity {
                 .getString("sortorder", "ASC");
 
         RadioButton rbName = findViewById(R.id.radioName);
-        RadioButton rbCity = findViewById(R.id.radioCity);
-        RadioButton rbIsFavorite = findViewById(R.id.radioIsFavorite);
+        RadioButton rbIsInCart = findViewById(R.id.radioIsInCart);
         RadioButton rbAscending = findViewById(R.id.radioAscending);
         RadioButton rbDescending = findViewById(R.id.radioDescending);
 
         rbName.setChecked(true);
-        rbCity.setChecked(sortBy.equalsIgnoreCase("city"));
-        rbIsFavorite.setChecked(sortBy.equalsIgnoreCase("isfavorite"));
+        rbIsInCart.setChecked(sortBy.equalsIgnoreCase("isInCart"));
 
         rbAscending.setChecked(true);
         rbDescending.setChecked(sortOrder.equalsIgnoreCase("DESC"));

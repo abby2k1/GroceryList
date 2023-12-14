@@ -41,7 +41,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.snackbar.Snackbar;
 
-public class GroceryEditActivity extends AppCompatActivity implements RaterDialog.SaveRatingListener, OnMapReadyCallback {
+public class GroceryEditActivity extends AppCompatActivity {
     Grocery grocery;
     public static final String TAG = GroceryEditActivity.class.getName();
     boolean loading = true;
@@ -67,25 +67,14 @@ public class GroceryEditActivity extends AppCompatActivity implements RaterDialo
         Navbar.initMapButton(this);
         Navbar.initSettingsButton(this);
 
-        initRatingButton();
         initSaveButton();
         initTextChanged(R.id.etName);
         initTextChanged(R.id.etCity);
         initTextChanged(R.id.editCell);
-        initCallFunction();
         initImageButton();
-        initMapTypeButtons();
-        initGeoButton();
-
-        //grocerys = new ArrayList<Grocery>();
-        //grocerys = GroceryListActivity.readFromTextFile(this);
-        //Log.d(TAG, "onCreate: Grocerys: " + grocerys.size());
 
         if(groceryId != -1)
         {
-            // Editing an existing grocery
-            //grocery = grocerys.get(groceryid-1);
-
             initGrocery(groceryId);
         }
         else {
@@ -97,13 +86,13 @@ public class GroceryEditActivity extends AppCompatActivity implements RaterDialo
         setForEditing(false);
         initToggleButton();
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map1);
-        mapFragment.getMapAsync(this);
+        //fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        //SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map1);
+        //mapFragment.getMapAsync(this);
 
         Log.d(TAG, "onCreate: End");
     }
-
+    /*
     private void initGeoButton() {
         Button btnGeo = findViewById(R.id.btnGeo);
         btnGeo.setOnClickListener(new View.OnClickListener() {
@@ -115,7 +104,7 @@ public class GroceryEditActivity extends AppCompatActivity implements RaterDialo
             }
         });
     }
-
+    */
     private void initImageButton() {
         ImageButton imageGrocery = findViewById(R.id.imageGrocery);
 
@@ -128,14 +117,11 @@ public class GroceryEditActivity extends AppCompatActivity implements RaterDialo
                     if(ContextCompat.checkSelfPermission(GroceryEditActivity.this, Manifest.permission.CAMERA) != PERMISSION_GRANTED){
                         if(ActivityCompat.shouldShowRequestPermissionRationale(GroceryEditActivity.this, Manifest.permission.CAMERA)){
                             Snackbar.make(findViewById(R.id.activity_main), "Grocerys requires this permission to take a photo.",
-                                    Snackbar.LENGTH_INDEFINITE).setAction("OK", new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    Log.d(TAG, "onClick: snackBar");
-                                    ActivityCompat.requestPermissions(GroceryEditActivity.this,
-                                            new String[] {Manifest.permission.CAMERA},PERMISSION_REQUEST_PHONE);
-                                }
-                            }).show();
+                                    Snackbar.LENGTH_INDEFINITE).setAction("OK", view1 -> {
+                                        Log.d(TAG, "onClick: snackBar");
+                                        ActivityCompat.requestPermissions(GroceryEditActivity.this,
+                                                new String[] {Manifest.permission.CAMERA},PERMISSION_REQUEST_PHONE);
+                                    }).show();
                         }
                         else {
                             Log.d(TAG, "onClick: ");
@@ -155,33 +141,28 @@ public class GroceryEditActivity extends AppCompatActivity implements RaterDialo
                 }
             }
         });
-
     }
 
     private void takePhoto() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(intent, CAMERA_REQUEST);;
     }
-
+    /*
     private void initMapTypeButtons() {
         Log.d(TAG, "initMapTypeButtons: Start");
         RadioGroup rgMapType = findViewById(R.id.radioGroupMapType1);
-        rgMapType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-
-            @Override
-            public void onCheckedChanged(RadioGroup arg0, int arg1) {
-                Log.d(TAG, "onCheckedChanged: onCheckedChanged");
-                RadioButton rbNormal = findViewById(R.id.radioButtonNormal1);
-                if (rbNormal.isChecked()) {
-                    gMap1.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                }
-                else  {
-                    gMap1.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-                }
+        rgMapType.setOnCheckedChangeListener((arg0, arg1) -> {
+            Log.d(TAG, "onCheckedChanged: onCheckedChanged");
+            RadioButton rbNormal = findViewById(R.id.radioButtonNormal1);
+            if (rbNormal.isChecked()) {
+                gMap1.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+            }
+            else  {
+                gMap1.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
             }
         });
     }
-
+    */
     protected  void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
@@ -197,17 +178,6 @@ public class GroceryEditActivity extends AppCompatActivity implements RaterDialo
                 grocery.setPhoto(scaledPhoto);
             }
         }
-    }
-
-    private void initCallFunction() {
-        EditText etPhone = findViewById(R.id.editCell);
-        etPhone.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                checkPhonePermission(grocery.getCellphone());
-                return false;
-            }
-        });
     }
 
     private void initGrocery(int groceryid) {
@@ -231,15 +201,8 @@ public class GroceryEditActivity extends AppCompatActivity implements RaterDialo
     private void setForEditing(boolean enabled)
     {
         EditText editName = findViewById(R.id.etName);
-        EditText editCity = findViewById(R.id.etCity);
-        EditText editCellPhone = findViewById(R.id.editCell);
-        TextView txtRating = findViewById(R.id.txtRating);
-        Button btnRating = findViewById(R.id.btnRating);
 
         editName.setEnabled(enabled);
-        editCity.setEnabled(enabled);
-        editCellPhone.setEnabled(enabled);
-        btnRating.setEnabled(enabled);
 
         if(enabled)
             // Set focus to this control
@@ -252,60 +215,11 @@ public class GroceryEditActivity extends AppCompatActivity implements RaterDialo
         }
     }
 
-    private void checkPhonePermission(String cellphone) {
-        // Check the API version
-        if(Build.VERSION.SDK_INT >= 23)
-        {
-            // Check for the manifest permission
-            if(ContextCompat.checkSelfPermission(GroceryEditActivity.this, Manifest.permission.CALL_PHONE) != PERMISSION_GRANTED){
-                if(ActivityCompat.shouldShowRequestPermissionRationale(GroceryEditActivity.this, Manifest.permission.CALL_PHONE)){
-                    Snackbar.make(findViewById(R.id.activity_main), "Grocerys requires this permission to place a call form the app.",
-                            Snackbar.LENGTH_INDEFINITE).setAction("OK", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Log.d(TAG, "onClick: snackBar");
-
-                            ActivityCompat.requestPermissions(GroceryEditActivity.this,
-                                    new String[] {Manifest.permission.CALL_PHONE},PERMISSION_REQUEST_PHONE);
-                        }
-                    }).show();
-                }
-                else {
-                    Log.d(TAG, "checkPhonePermission: 1");
-                    ActivityCompat.requestPermissions(GroceryEditActivity.this,
-                            new String[] {Manifest.permission.CALL_PHONE},PERMISSION_REQUEST_PHONE);
-                    callGrocery(cellphone);
-                }
-            }
-            else{
-                Log.d(TAG, "checkPhonePermission: 2");
-                callGrocery(cellphone);
-            }
-        }
-        else {
-            // Only rely on the previous permissions
-            callGrocery(cellphone);
-        }
-    }
-
-    private void callGrocery(String cellphone) {
-        Log.d(TAG, "callGrocery: " + cellphone);
-        Intent intent = new Intent(Intent.ACTION_CALL);
-        intent.setData(Uri.parse("tel:" + cellphone));
-        startActivity(intent);
-
-    }
-
     private void initToggleButton() {
 
         ToggleButton toggleButton = findViewById(R.id.toggleButtonEdit);
         toggleButton.setChecked(false);
-        toggleButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setForEditing(toggleButton.isChecked());
-            }
-        });
+        toggleButton.setOnClickListener(view -> setForEditing(toggleButton.isChecked()));
 
     }
 
@@ -336,83 +250,49 @@ public class GroceryEditActivity extends AppCompatActivity implements RaterDialo
     private void RebindGrocery()
     {
         EditText editName = findViewById(R.id.etName);
-        EditText editCity = findViewById(R.id.etCity);
-        EditText editCellPhone = findViewById(R.id.editCell);
-        TextView txtRating = findViewById(R.id.txtRating);
 
         if(grocery == null)
             return;
 
         editName.setText(grocery.getName());
-        editCity.setText(grocery.getCity());
-        editCellPhone.setText(grocery.getCellphone());
-        txtRating.setText(String.valueOf(grocery.getRating()));
 
         ImageButton imageGrocery = findViewById(R.id.imageGrocery);
         if(grocery.getPhoto() != null)
             imageGrocery.setImageBitmap(grocery.getPhoto());
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map1);
-        mapFragment.getMapAsync(this);
+        //fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        //SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map1);
+        //mapFragment.getMapAsync(this);
     }
     private void initSaveButton() {
         Button btnSave = findViewById(R.id.btnSave);
 
-        btnSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(groceryId == -1)
-                {
-                    Log.d(TAG, "Inserting: " +grocery.toString());
+        btnSave.setOnClickListener(view -> {
+            if(groceryId == -1)
+            {
+                Log.d(TAG, "Inserting: " +grocery.toString());
 
-                    RestClient.execPostRequest(grocery,
-                            GroceryListActivity.TEAMSAPI,
-                            GroceryEditActivity.this,
-                            VolleyCallback -> {
-                                grocery.setId(VolleyCallback.get(0).getId());
-                                Log.d(TAG, "onSuccess: Post" + grocery.getId());
-                            });
-                }
-                else {
-                    Log.d(TAG, "Updating: " + grocery.toString());
-                    RestClient.execPutRequest(grocery,
-                            GroceryListActivity.TEAMSAPI + groceryId,
-                            GroceryEditActivity.this,
-                            VolleyCallback -> {
-                                Log.d(TAG, "onSuccess: Post" + grocery.getId());
-                            });
-                }
-                //FileIO.writeFile(GroceryListActivity.FILENAME,
-                //           GroceryEditActivity.this,
-                //                 GroceryListActivity.createGroceryArray(grocerys));
+                RestClient.execPostRequest(grocery,
+                        GroceryListActivity.TEAMSAPI,
+                        GroceryEditActivity.this,
+                        VolleyCallback -> {
+                            grocery.setId(VolleyCallback.get(0).getId());
+                            Log.d(TAG, "onSuccess: Post" + grocery.getId());
+                        });
+            }
+            else {
+                Log.d(TAG, "Updating: " + grocery.toString());
+                RestClient.execPutRequest(grocery,
+                        GroceryListActivity.TEAMSAPI + groceryId,
+                        GroceryEditActivity.this,
+                        VolleyCallback -> {
+                            Log.d(TAG, "onSuccess: Post" + grocery.getId());
+                        });
             }
         });
 
     }
-
-    private void initRatingButton() {
-        Button btnRating = findViewById(R.id.btnRating);
-
-        btnRating.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                RaterDialog raterDialog = new RaterDialog(grocery.getRating());
-                raterDialog.show(fragmentManager, "Rate Grocery");
-            }
-        });
-
-    }
-
-    @Override
-    public void didFinishGroceryRaterDialog(float rating) {
-        Log.d(TAG, "didFinishGroceryRaterDialog: ");
-        TextView txtRating = findViewById(R.id.txtRating);
-        txtRating.setText(String.valueOf(rating));
-        grocery.setRating(rating);
-    }
-
+    /*
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         try {
@@ -445,4 +325,5 @@ public class GroceryEditActivity extends AppCompatActivity implements RaterDialo
             Log.d(TAG, "onMapReady: " + e.getMessage());
         }
     }
+    */
 }

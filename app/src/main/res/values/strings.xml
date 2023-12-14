@@ -6,7 +6,7 @@
     <string name="grocery_list">Grocery List</string>
     <string name="grocery_settings">Grocery Settings</string>
     <string name="grocery_map">Grocery Map</string>
-    <string name="favorite">Favorite</string>
+    <string name="incart">In Cart</string>
     <string name="grocery_image">Grocery Image</string>
     <string name="toggleButton">OFF</string>
     <string name="save">Save</string>
@@ -19,7 +19,7 @@
     <string name="cell_phone">Cell Phone</string>
     <string name="rating">Rating</string>
     <string name="rate">Rate</string>
-    <string name="isFavorite">Is Favorite</string>
+    <string name="isInCart">Is In Cart</string>
     <string name="sort_by">Sort By</string>
     <string name="ascending">Ascending</string>
     <string name="descending">Descending</string>
