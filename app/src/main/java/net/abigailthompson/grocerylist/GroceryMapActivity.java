@@ -50,7 +50,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GroceryMapActivity extends AppCompatActivity implements OnMapReadyCallback {
-
     public static final String TAG = "GroceryMapActivity";
     final int PERMISSION_REQUEST_LOCATION = 101;
     GoogleMap gMap;
@@ -59,7 +58,7 @@ public class GroceryMapActivity extends AppCompatActivity implements OnMapReadyC
     LocationCallback locationCallback;
     ArrayList<Grocery> Grocerys = new ArrayList<>();
     Grocery currentGrocery = null;
-    int groceryId = -1;
+    int groceryId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,39 +70,26 @@ public class GroceryMapActivity extends AppCompatActivity implements OnMapReadyC
             groceryId = extras.getInt("groceryid");
             this.setTitle("Grocery: " + groceryId);
 
-            if(groceryId != -1)
-            {
-                initGrocery(groceryId);
-            }
-            else {
-                // Making a new grocery.
-                currentGrocery = new Grocery();
-            }
+            initMapTypeButtons();
+            initGetLocationButton();
+            initSaveButton();
         } catch (Exception e) {
             Log.d(TAG, "onCreate: " + e.getMessage());
         }
 
-        //Bundle extras = getIntent().getExtras();
-        //try {
-        //GroceryDataSource ds = new GroceryDataSource(GroceryMapActivity.this);
-        //ds.open();
-        //if(extras !=null){
-        // TODO currentGrocery = ds.getSpecificGrocery(extras.getInt("Groceryid"));
-        //}
-        //else {
-        // TODO Grocerys = ds.getGrocerys("Groceryname", "ASC");
-        //}
-        //ds.close();
-        //}
-        //catch (Exception e) {
-        //    Toast.makeText(this, "Grocery(s) could not be retrieved.", Toast.LENGTH_LONG).show();
-
-        //}
+        if(groceryId != -1)
+        {
+            initGrocery(groceryId);
+        }
+        else {
+            // Making a new grocery.
+            currentGrocery = new Grocery();
+        }
 
         Navbar.initListButton(this);
         Navbar.initMapButton(this);
         Navbar.initSettingsButton(this);
-        initMapTypeButtons();
+
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -150,6 +136,108 @@ public class GroceryMapActivity extends AppCompatActivity implements OnMapReadyC
             return;
         }
         fusedLocationClient.removeLocationUpdates(locationCallback);
+    }
+
+    private void initGetLocationButton(){
+        Button buttonGetLocation = findViewById(R.id.buttonGetLocation);
+
+        buttonGetLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText editAddress = findViewById(R.id.editAddress);
+                EditText editCity = findViewById(R.id.editCity);
+                EditText editState = findViewById(R.id.editState);
+                EditText editZipcode = findViewById(R.id.editZipcode);
+
+                String address = editAddress.getText().toString() + ", " +
+                        editCity.getText().toString() + ", " +
+                        editState.getText().toString() + ", " +
+                        editZipcode.getText().toString();
+                List<Address> addresses = null;
+
+                Geocoder geo = new Geocoder(GroceryMapActivity.this);
+                try{
+                    addresses = geo.getFromLocationName(address, 1);
+                }
+                catch(IOException e)
+                {
+                    e.printStackTrace();
+                }
+                TextView txtLatitude = findViewById((R.id.textLatitude));
+                TextView txtLongitude = findViewById((R.id.textLongitude));
+
+                txtLatitude.setText(String.valueOf(addresses.get(0).getLatitude()));
+                txtLongitude.setText(String.valueOf(addresses.get(0).getLongitude()));
+
+                if(currentGrocery != null)
+                {
+                    currentGrocery.setLatitude(addresses.get(0).getLatitude());
+                    currentGrocery.setLongitude(addresses.get(0).getLongitude());
+                }
+
+
+            }
+        });
+    }
+
+    private void initGrocery(int groceryid) {
+        try{
+            Log.d(TAG, "initGrocery: " + groceryid);
+
+            RestClient.execGetOneRequest(GroceryListActivity.TEAMSAPI + groceryid,
+                    this,
+                    new VolleyCallback() {
+                        @Override
+                        public void onSuccess(ArrayList<Grocery> result) {
+                            currentGrocery = result.get(0);
+                            Log.d(TAG, "onSuccess: " + currentGrocery.getName());
+                            GroceryMapActivity.this.setTitle(currentGrocery.getName());
+                        }
+                    });
+
+            Log.d(TAG, "initGrocery: " + currentGrocery.toString());
+        }
+        catch(Exception e)
+        {
+            Log.d(TAG, "initGrocery: " + e.getMessage());
+        }
+
+    }
+
+    private void initSaveButton() {
+        Button btnSave = findViewById(R.id.btnSave);
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(groceryId == -1)
+                {
+                    Log.d(TAG, "Inserting: " +currentGrocery.toString());
+                    RestClient.execPostRequest(currentGrocery,
+                            GroceryListActivity.TEAMSAPI,
+                            GroceryMapActivity.this,
+                            new VolleyCallback() {
+                                @Override
+                                public void onSuccess(ArrayList<Grocery> result) {
+                                    currentGrocery.setId(result.get(0).getId());
+                                    Log.d(TAG, "onSuccess: Post" + currentGrocery.getId());
+                                }
+                            });
+                }
+                else {
+                    Log.d(TAG, "Updating: " + currentGrocery.toString());
+                    RestClient.execPutRequest(currentGrocery,
+                            GroceryListActivity.TEAMSAPI + groceryId,
+                            GroceryMapActivity.this,
+                            new VolleyCallback() {
+                                @Override
+                                public void onSuccess(ArrayList<Grocery> result) {
+                                    Log.d(TAG, "onSuccess: Post" + currentGrocery.getId());
+                                }
+                            });
+                }
+            }
+        });
+
     }
 
     private void initMapTypeButtons() {
@@ -291,108 +379,6 @@ public class GroceryMapActivity extends AppCompatActivity implements OnMapReadyC
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-    }
-
-    private void initGetLocationButton(){
-        Button buttonGetLocation = findViewById(R.id.buttonGetLocation);
-
-        buttonGetLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EditText editAddress = findViewById(R.id.editAddress);
-                EditText editCity = findViewById(R.id.editCity);
-                EditText editState = findViewById(R.id.editState);
-                EditText editZipcode = findViewById(R.id.editZipcode);
-
-                String address = editAddress.getText().toString() + ", " +
-                        editCity.getText().toString() + ", " +
-                        editState.getText().toString() + ", " +
-                        editZipcode.getText().toString();
-                List<Address> addresses = null;
-
-                Geocoder geo = new Geocoder(GroceryMapActivity.this);
-                try{
-                    addresses = geo.getFromLocationName(address, 1);
-                }
-                catch(IOException e)
-                {
-                    e.printStackTrace();
-                }
-                TextView txtLatitude = findViewById((R.id.textLatitude));
-                TextView txtLongitude = findViewById((R.id.textLongitude));
-
-                txtLatitude.setText(String.valueOf(addresses.get(0).getLatitude()));
-                txtLongitude.setText(String.valueOf(addresses.get(0).getLongitude()));
-
-                if(currentGrocery != null)
-                {
-                    currentGrocery.setLatitude(addresses.get(0).getLatitude());
-                    currentGrocery.setLongitude(addresses.get(0).getLongitude());
-                }
-
-
-            }
-        });
-    }
-
-    private void initGrocery(int groceryid) {
-        try{
-            Log.d(TAG, "initGrocery: " + groceryid);
-
-            RestClient.execGetOneRequest(GroceryListActivity.TEAMSAPI + groceryid,
-                    this,
-                    new VolleyCallback() {
-                        @Override
-                        public void onSuccess(ArrayList<Grocery> result) {
-                            currentGrocery = result.get(0);
-                            Log.d(TAG, "onSuccess: " + currentGrocery.getName());
-                            GroceryMapActivity.this.setTitle(currentGrocery.getName());
-                        }
-                    });
-
-            Log.d(TAG, "initGrocery: " + currentGrocery.toString());
-        }
-        catch(Exception e)
-        {
-            Log.d(TAG, "initGrocery: " + e.getMessage());
-        }
-
-    }
-
-    private void initSaveButton() {
-        Button btnSave = findViewById(R.id.btnSave);
-        btnSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(groceryId == -1)
-                {
-                    Log.d(TAG, "Inserting: " +currentGrocery.toString());
-                    RestClient.execPostRequest(currentGrocery,
-                            GroceryListActivity.TEAMSAPI,
-                            GroceryMapActivity.this,
-                            new VolleyCallback() {
-                                @Override
-                                public void onSuccess(ArrayList<Grocery> result) {
-                                    currentGrocery.setId(result.get(0).getId());
-                                    Log.d(TAG, "onSuccess: Post" + currentGrocery.getId());
-                                }
-                            });
-                }
-                else {
-                    Log.d(TAG, "Updating: " + currentGrocery.toString());
-                    RestClient.execPutRequest(currentGrocery,
-                            GroceryListActivity.TEAMSAPI + groceryId,
-                            GroceryMapActivity.this,
-                            new VolleyCallback() {
-                                @Override
-                                public void onSuccess(ArrayList<Grocery> result) {
-                                    Log.d(TAG, "onSuccess: Post" + currentGrocery.getId());
-                                }
-                            });
-                }
-            }
-        });
-
     }
 
 }

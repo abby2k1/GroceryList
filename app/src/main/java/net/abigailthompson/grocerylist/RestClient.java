@@ -302,8 +302,19 @@ public class RestClient {
                                 Grocery grocery = new Grocery();
                                 grocery.setId(object.getInt("id"));
                                 grocery.setName(object.getString("item"));
-                                grocery.setIsOnShoppingList(Boolean.parseBoolean(object.getString("isOnShoppingList")));
-                                grocery.setIsInCart(Boolean.parseBoolean(object.getString("isInCart")));
+
+                                if (object.getString("isOnShoppingList").equals("1")) {
+                                    grocery.setIsOnShoppingList(true);
+                                } else {
+                                    grocery.setIsOnShoppingList(false);
+                                }
+
+                                if (object.getString("isInCart").equals("1")) {
+                                    grocery.setIsInCart(true);
+                                } else {
+                                    grocery.setIsInCart(false);
+                                }
+
                                 grocery.setLatitude(object.getDouble("latitude"));
                                 grocery.setLongitude(object.getDouble("longitude"));
 

@@ -2,7 +2,12 @@ package net.abigailthompson.grocerylist;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
-import android.Manifest;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentManager;
+
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Point;
@@ -23,12 +28,7 @@ import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentManager;
+import android.Manifest;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -40,6 +40,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.snackbar.Snackbar;
+
+import java.util.ArrayList;
 
 public class GroceryEditActivity extends AppCompatActivity implements OnMapReadyCallback {
     Grocery grocery;
@@ -70,9 +72,19 @@ public class GroceryEditActivity extends AppCompatActivity implements OnMapReady
         initSaveButton();
         initTextChanged(R.id.etName);
         initImageButton();
+        initMapTypeButtons();
+        initGeoButton();
+
+
+        //grocerys = new ArrayList<Grocery>();
+        //grocerys = GroceryListActivity.readFromTextFile(this);
+        //Log.d(TAG, "onCreate: Grocerys: " + grocerys.size());
 
         if(groceryId != -1)
         {
+            // Editing an existing grocery
+            //grocery = grocerys.get(groceryid-1);
+
             initGrocery(groceryId);
         }
         else {
@@ -84,13 +96,13 @@ public class GroceryEditActivity extends AppCompatActivity implements OnMapReady
         setForEditing(false);
         initToggleButton();
 
-        //fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        //SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map1);
-        //mapFragment.getMapAsync(this);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map1);
+        mapFragment.getMapAsync(this);
 
         Log.d(TAG, "onCreate: End");
     }
-    /*
+
     private void initGeoButton() {
         Button btnGeo = findViewById(R.id.btnGeo);
         btnGeo.setOnClickListener(new View.OnClickListener() {
@@ -102,7 +114,7 @@ public class GroceryEditActivity extends AppCompatActivity implements OnMapReady
             }
         });
     }
-    */
+
     private void initImageButton() {
         ImageButton imageGrocery = findViewById(R.id.imageGrocery);
 
@@ -115,11 +127,14 @@ public class GroceryEditActivity extends AppCompatActivity implements OnMapReady
                     if(ContextCompat.checkSelfPermission(GroceryEditActivity.this, Manifest.permission.CAMERA) != PERMISSION_GRANTED){
                         if(ActivityCompat.shouldShowRequestPermissionRationale(GroceryEditActivity.this, Manifest.permission.CAMERA)){
                             Snackbar.make(findViewById(R.id.activity_main), "Grocerys requires this permission to take a photo.",
-                                    Snackbar.LENGTH_INDEFINITE).setAction("OK", view1 -> {
-                                        Log.d(TAG, "onClick: snackBar");
-                                        ActivityCompat.requestPermissions(GroceryEditActivity.this,
-                                                new String[] {Manifest.permission.CAMERA},PERMISSION_REQUEST_PHONE);
-                                    }).show();
+                                    Snackbar.LENGTH_INDEFINITE).setAction("OK", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Log.d(TAG, "onClick: snackBar");
+                                    ActivityCompat.requestPermissions(GroceryEditActivity.this,
+                                            new String[] {Manifest.permission.CAMERA},PERMISSION_REQUEST_PHONE);
+                                }
+                            }).show();
                         }
                         else {
                             Log.d(TAG, "onClick: ");
@@ -139,28 +154,14 @@ public class GroceryEditActivity extends AppCompatActivity implements OnMapReady
                 }
             }
         });
+
     }
 
     private void takePhoto() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(intent, CAMERA_REQUEST);;
     }
-    /*
-    private void initMapTypeButtons() {
-        Log.d(TAG, "initMapTypeButtons: Start");
-        RadioGroup rgMapType = findViewById(R.id.radioGroupMapType1);
-        rgMapType.setOnCheckedChangeListener((arg0, arg1) -> {
-            Log.d(TAG, "onCheckedChanged: onCheckedChanged");
-            RadioButton rbNormal = findViewById(R.id.radioButtonNormal1);
-            if (rbNormal.isChecked()) {
-                gMap1.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-            }
-            else  {
-                gMap1.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-            }
-        });
-    }
-    */
+
     protected  void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
@@ -180,15 +181,25 @@ public class GroceryEditActivity extends AppCompatActivity implements OnMapReady
 
     private void initGrocery(int groceryid) {
         try{
+            //GroceryDataSource ds = new GroceryDataSource(this);
+            //ds.open();
             Log.d(TAG, "initGrocery: " + groceryid);
+            //grocery = ds.get(groceryid);
+            //ds.close();
+
             RestClient.execGetOneRequest(GroceryListActivity.TEAMSAPI + groceryid,
                     this,
-                    VolleyCallback -> {
-                        grocery = VolleyCallback.get(0);
-                        Log.d(TAG, "onSuccess: " + grocery.getName());
-                        GroceryEditActivity.this.setTitle(grocery.getName());
-                        RebindGrocery();
+                    new VolleyCallback() {
+                        @Override
+                        public void onSuccess(ArrayList<Grocery> result) {
+                            grocery = result.get(0);
+                            Log.d(TAG, "onSuccess: " + grocery.getName());
+                            GroceryEditActivity.this.setTitle(grocery.getName());
+                            RebindGrocery();
+                        }
                     });
+
+            Log.d(TAG, "initGrocery: " + grocery.toString());
         }
         catch(Exception e)
         {
@@ -199,9 +210,7 @@ public class GroceryEditActivity extends AppCompatActivity implements OnMapReady
     private void setForEditing(boolean enabled)
     {
         EditText editName = findViewById(R.id.etName);
-
         editName.setEnabled(enabled);
-
         if(enabled)
             // Set focus to this control
             editName.requestFocus();
@@ -217,7 +226,12 @@ public class GroceryEditActivity extends AppCompatActivity implements OnMapReady
 
         ToggleButton toggleButton = findViewById(R.id.toggleButtonEdit);
         toggleButton.setChecked(false);
-        toggleButton.setOnClickListener(view -> setForEditing(toggleButton.isChecked()));
+        toggleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setForEditing(toggleButton.isChecked());
+            }
+        });
 
     }
 
@@ -248,44 +262,79 @@ public class GroceryEditActivity extends AppCompatActivity implements OnMapReady
     private void RebindGrocery()
     {
         EditText editName = findViewById(R.id.etName);
+        if(grocery != null) {
+            editName.setText(grocery.getName());
+            ImageButton imageGrocery = findViewById(R.id.imageGrocery);
+            if(grocery.getPhoto() != null)
+                imageGrocery.setImageBitmap(grocery.getPhoto());
 
-        if(grocery == null)
-            return;
-
-        editName.setText(grocery.getName());
-
-        ImageButton imageGrocery = findViewById(R.id.imageGrocery);
-        if(grocery.getPhoto() != null)
-            imageGrocery.setImageBitmap(grocery.getPhoto());
-
-        //fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        //SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map1);
-        //mapFragment.getMapAsync(this);
+            fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+            SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map1);
+            mapFragment.getMapAsync(this);
+        }
     }
+
+    private void initMapTypeButtons() {
+        Log.d(TAG, "initMapTypeButtons: Start");
+        RadioGroup rgMapType = findViewById(R.id.radioGroupMapType1);
+        rgMapType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(RadioGroup arg0, int arg1) {
+                Log.d(TAG, "onCheckedChanged: onCheckedChanged");
+                RadioButton rbNormal = findViewById(R.id.radioButtonNormal1);
+                if (rbNormal.isChecked()) {
+                    gMap1.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                }
+                else  {
+                    gMap1.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                }
+            }
+        });
+    }
+
     private void initSaveButton() {
         Button btnSave = findViewById(R.id.btnSave);
 
-        btnSave.setOnClickListener(view -> {
-            if(groceryId == -1)
-            {
-                Log.d(TAG, "Inserting: " +grocery.toString());
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //GroceryDataSource ds = new GroceryDataSource(GroceryEditActivity.this);
+                //ds.open();
+                if(groceryId == -1)
+                {
+                    Log.d(TAG, "Inserting: " +grocery.toString());
+                    //grocery.setId(ds.getNewId());
+                    //ds.insert(grocery);
 
-                RestClient.execPostRequest(grocery,
-                        "https://fvtcdp.azurewebsites.net/api/GroceryList/false",
-                        GroceryEditActivity.this,
-                        VolleyCallback -> {
-                            grocery.setId(VolleyCallback.get(0).getId());
-                            Log.d(TAG, "onSuccess: Post" + grocery.getId());
-                        });
-            }
-            else {
-                Log.d(TAG, "Updating: " + grocery.toString());
-                RestClient.execPutRequest(grocery,
-                        "https://fvtcdp.azurewebsites.net/api/GroceryList/" + groceryId,
-                        GroceryEditActivity.this,
-                        VolleyCallback -> {
-                            Log.d(TAG, "onSuccess: Post" + grocery.getId());
-                        });
+                    RestClient.execPostRequest(grocery,
+                            GroceryListActivity.TEAMSAPI,
+                            GroceryEditActivity.this,
+                            new VolleyCallback() {
+                                @Override
+                                public void onSuccess(ArrayList<Grocery> result) {
+                                    grocery.setId(result.get(0).getId());
+                                    Log.d(TAG, "onSuccess: Post" + grocery.getId());
+                                }
+                            });
+                }
+                else {
+                    Log.d(TAG, "Updating: " + grocery.toString());
+                    RestClient.execPutRequest(grocery,
+                            GroceryListActivity.TEAMSAPI + groceryId,
+                            GroceryEditActivity.this,
+                            new VolleyCallback() {
+                                @Override
+                                public void onSuccess(ArrayList<Grocery> result) {
+                                    Log.d(TAG, "onSuccess: Post" + grocery.getId());
+                                }
+                            });
+                    //ds.update(grocery);
+                }
+                //ds.close();
+                //FileIO.writeFile(GroceryListActivity.FILENAME,
+                //           GroceryEditActivity.this,
+                //                 GroceryListActivity.createGroceryArray(grocerys));
             }
         });
 
@@ -323,5 +372,4 @@ public class GroceryEditActivity extends AppCompatActivity implements OnMapReady
             Log.d(TAG, "onMapReady: " + e.getMessage());
         }
     }
-
 }
