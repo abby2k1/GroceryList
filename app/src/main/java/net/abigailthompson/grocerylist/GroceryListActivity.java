@@ -53,18 +53,19 @@ public class GroceryListActivity extends AppCompatActivity {
         int position = viewHolder.getAdapterPosition();
         int id = grocerys.get(position).getId();
         Grocery grocery = grocerys.get(position);
+        id = grocery.getId();
 
         String listMode = getSharedPreferences("groceryspreferences",
                 Context.MODE_PRIVATE)
                 .getString("listselected", "shoppinglist");
 
         if (!listMode.equals("masterlist")) {
-            grocerys.get(position).setIsInCart(b);
-            Log.d(TAG, "onCheckedChanged: " + grocerys.get(position).getName());
+            grocery.setIsInCart(b);
+            Log.d(TAG, "onCheckedChanged: " + grocery.getName());
 
             // grocery.setIsInCart(b);
 
-            RestClient.execPutRequest(grocerys.get(position), TEAMSAPI + id, this,
+            RestClient.execPutRequest(grocery, TEAMSAPI + id, this,
                     VolleyCallback -> {
                         Log.d(TAG, "onSuccess: " + VolleyCallback);
                         //grocerys.set(position, VolleyCallback);
@@ -246,6 +247,7 @@ public class GroceryListActivity extends AppCompatActivity {
                 .getString("listselected", "shoppinglist");
         if (!listMode.equals("masterlist"))
         {
+            this.setTitle(getString(R.string.shopping_list));
             try {
                 Log.d(TAG, "readFromAPI: Start");
 
@@ -269,6 +271,7 @@ public class GroceryListActivity extends AppCompatActivity {
         }
         else if (listMode.equals("masterlist"))
         {
+            this.setTitle(getString(R.string.master_list));
             try {
                 Log.d(TAG, "readFromAPI: Start");
 

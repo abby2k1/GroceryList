@@ -50,6 +50,7 @@ public class GroceryAdapter extends RecyclerView.Adapter {
             itemView.setTag(this);
             itemView.setOnClickListener(onItemClickListener);
             chkInCart.setTag(this);
+            chkInCart.setText("In Cart");
             chkInCart.setOnCheckedChangeListener(onCheckedChangeListener);
         }
 

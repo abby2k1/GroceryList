@@ -46,8 +46,19 @@ public class RestClient {
                                 Grocery grocery = new Grocery();
                                 grocery.setId(item.getInt("id"));
                                 grocery.setName(item.getString("item"));
-                                grocery.setIsOnShoppingList(item.getBoolean("isOnShoppingList"));
-                                grocery.setIsInCart(item.getBoolean("isInCart"));
+
+                                if (item.getString("isOnShoppingList").equals("1")) {
+                                    grocery.setIsOnShoppingList(true);
+                                } else {
+                                    grocery.setIsOnShoppingList(false);
+                                }
+
+                                if (item.getString("isInCart").equals("1")) {
+                                    grocery.setIsInCart(true);
+                                } else {
+                                    grocery.setIsInCart(false);
+                                }
+
                                 grocery.setLatitude(item.getDouble("latitude"));
                                 grocery.setLongitude(item.getDouble("longitude"));
 
@@ -102,8 +113,19 @@ public class RestClient {
                                 Grocery grocery = new Grocery();
                                 grocery.setId(item.getInt("id"));
                                 grocery.setName(item.getString("item"));
-                                grocery.setIsOnShoppingList(item.getBoolean("isOnShoppingList"));
-                                grocery.setIsInCart(item.getBoolean("isInCart"));
+
+                                if (item.getString("isOnShoppingList").equals("1")) {
+                                    grocery.setIsOnShoppingList(true);
+                                } else {
+                                    grocery.setIsOnShoppingList(false);
+                                }
+
+                                if (item.getString("isInCart").equals("1")) {
+                                    grocery.setIsInCart(true);
+                                } else {
+                                    grocery.setIsInCart(false);
+                                }
+
                                 grocery.setLatitude(item.getDouble("latitude"));
                                 grocery.setLongitude(item.getDouble("longitude"));
 
@@ -189,8 +211,25 @@ public class RestClient {
 
             object.put("id", grocery.getId());
             object.put("item", grocery.getName());
-            object.put("isOnShoppingList", grocery.getIsOnShoppingList());
-            object.put("isInCart", grocery.getIsInCart());
+
+            if(grocery.getIsOnShoppingList())
+            {
+                object.put("isOnShoppingList", "1");
+            }
+            else
+            {
+                object.put("isOnShoppingList", "0");
+            }
+
+            if(grocery.getIsInCart())
+            {
+                object.put("isInCart", "1");
+            }
+            else
+            {
+                object.put("isInCart", "0");
+            }
+
             object.put("owner", "abigailt");
             object.put("latitude", grocery.getLatitude());
             object.put("longitude", grocery.getLongitude());
@@ -262,10 +301,9 @@ public class RestClient {
                                 JSONObject object = new JSONObject(response);
                                 Grocery grocery = new Grocery();
                                 grocery.setId(object.getInt("id"));
-                                grocery.setName(object.getString("name"));
-                                grocery.setIsOnShoppingList(object.getBoolean("isOnShoppingList"));
-                                grocery.setIsInCart(object.getBoolean("isInCart"));
-
+                                grocery.setName(object.getString("item"));
+                                grocery.setIsOnShoppingList(Boolean.parseBoolean(object.getString("isOnShoppingList")));
+                                grocery.setIsInCart(Boolean.parseBoolean(object.getString("isInCart")));
                                 grocery.setLatitude(object.getDouble("latitude"));
                                 grocery.setLongitude(object.getDouble("longitude"));
 

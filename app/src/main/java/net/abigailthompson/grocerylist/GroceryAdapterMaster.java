@@ -50,6 +50,7 @@ public class GroceryAdapterMaster extends RecyclerView.Adapter {
             itemView.setTag(this);
             itemView.setOnClickListener(onItemClickListener);
             chkInCart.setTag(this);
+            chkInCart.setText("On Shopping List");
             chkInCart.setOnCheckedChangeListener(onCheckedChangeListener);
         }
 

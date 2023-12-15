@@ -59,6 +59,9 @@ public class Grocery implements Serializable {
     }
 
     public String getName() {
+        if (name == null) {
+            return "";
+        }
         return name;
     }
 

@@ -42,4 +42,5 @@
     <string name="shopping_list">Shopping List</string>
     <string name="clear_all">Clear All</string>
     <string name="delete_checked">Delete Checked</string>
+    <string name="is_checked">Is Checked</string>
 </resources>
