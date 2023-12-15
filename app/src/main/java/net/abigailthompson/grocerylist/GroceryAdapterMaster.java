@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-public class GroceryAdapter extends RecyclerView.Adapter {
+public class GroceryAdapterMaster extends RecyclerView.Adapter {
     boolean isDeleting;
     private ArrayList<Grocery> GroceryData;
     private View.OnClickListener onItemClickListener;
@@ -30,7 +30,7 @@ public class GroceryAdapter extends RecyclerView.Adapter {
         isDeleting = b;
     }
 
-    public class GroceryViewHolder extends RecyclerView.ViewHolder{
+    public class MasterViewHolder extends RecyclerView.ViewHolder{
         private TextView tvName;
         private Button btnDelete;
         private CheckBox chkInCart;
@@ -40,7 +40,7 @@ public class GroceryAdapter extends RecyclerView.Adapter {
         private View.OnClickListener onClickListener;
         private CompoundButton.OnCheckedChangeListener onCheckedChangeListener;
 
-        public GroceryViewHolder(@NonNull View itemView) {
+        public MasterViewHolder(@NonNull View itemView) {
             super(itemView);
             tvName = itemView.findViewById(R.id.tvName);
             chkInCart = itemView.findViewById(R.id.chkInCart);
@@ -70,7 +70,7 @@ public class GroceryAdapter extends RecyclerView.Adapter {
 
     }
 
-    public GroceryAdapter(ArrayList<Grocery> data, Context context)
+    public GroceryAdapterMaster(ArrayList<Grocery> data, Context context)
     {
         GroceryData = data;
         Log.d(TAG, "GroceryAdapter: " + data.size());
@@ -93,7 +93,7 @@ public class GroceryAdapter extends RecyclerView.Adapter {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
-        return new GroceryViewHolder(v);
+        return new MasterViewHolder(v);
     }
 
     @Override
@@ -102,9 +102,9 @@ public class GroceryAdapter extends RecyclerView.Adapter {
 
         Grocery grocery = GroceryData.get(position);
 
-        GroceryViewHolder groceryViewHolder = (GroceryViewHolder) holder;
+        MasterViewHolder groceryViewHolder = (MasterViewHolder) holder;
         groceryViewHolder.getName().setText(grocery.getName());
-        groceryViewHolder.getChkInCart().setChecked(grocery.getIsInCart());
+        groceryViewHolder.getChkInCart().setChecked(grocery.getIsOnShoppingList());
 
         Bitmap groceryPhoto = grocery.getPhoto();
 
@@ -151,13 +151,14 @@ public class GroceryAdapter extends RecyclerView.Adapter {
             //GroceryDataSource ds = new GroceryDataSource(parentContext);
             //ds.open();
             Log.d(TAG, "deleteItem: " + grocery.getName());
-            grocery.setIsOnShoppingList(false);
             //boolean didDelete = ds.delete(grocery) > 0;
-            RestClient.execPutRequest(grocery,
+            RestClient.execDeleteRequest(grocery,
                     GroceryListActivity.TEAMSAPI + grocery.getId(),
                     this.parentContext,
                     VolleyCallback -> {
-                        Log.d(TAG, "onSuccess: Put" + grocery.getId());
+                        Log.d(TAG, "onSuccess: Delete" + grocery.getId());
+                        GroceryData.remove(position);
+                        notifyDataSetChanged();
                     });
 
         } catch (Exception e) {

@@ -41,7 +41,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.snackbar.Snackbar;
 
-public class GroceryEditActivity extends AppCompatActivity {
+public class GroceryEditActivity extends AppCompatActivity implements OnMapReadyCallback {
     Grocery grocery;
     public static final String TAG = GroceryEditActivity.class.getName();
     boolean loading = true;
@@ -69,8 +69,6 @@ public class GroceryEditActivity extends AppCompatActivity {
 
         initSaveButton();
         initTextChanged(R.id.etName);
-        initTextChanged(R.id.etCity);
-        initTextChanged(R.id.editCell);
         initImageButton();
 
         if(groceryId != -1)
@@ -273,7 +271,7 @@ public class GroceryEditActivity extends AppCompatActivity {
                 Log.d(TAG, "Inserting: " +grocery.toString());
 
                 RestClient.execPostRequest(grocery,
-                        GroceryListActivity.TEAMSAPI,
+                        "https://fvtcdp.azurewebsites.net/api/GroceryList/false",
                         GroceryEditActivity.this,
                         VolleyCallback -> {
                             grocery.setId(VolleyCallback.get(0).getId());
@@ -283,7 +281,7 @@ public class GroceryEditActivity extends AppCompatActivity {
             else {
                 Log.d(TAG, "Updating: " + grocery.toString());
                 RestClient.execPutRequest(grocery,
-                        GroceryListActivity.TEAMSAPI + groceryId,
+                        "https://fvtcdp.azurewebsites.net/api/GroceryList/" + groceryId,
                         GroceryEditActivity.this,
                         VolleyCallback -> {
                             Log.d(TAG, "onSuccess: Post" + grocery.getId());
@@ -292,7 +290,7 @@ public class GroceryEditActivity extends AppCompatActivity {
         });
 
     }
-    /*
+
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         try {
@@ -325,5 +323,5 @@ public class GroceryEditActivity extends AppCompatActivity {
             Log.d(TAG, "onMapReady: " + e.getMessage());
         }
     }
-    */
+
 }

@@ -10,6 +10,8 @@ public class Grocery implements Serializable {
     private String name;
     private boolean isonshoppinglist;
     private boolean isincart;
+    private double latitude;
+    private double longitude;
     private Bitmap photo;
     public Bitmap getPhoto() {
         return photo;
@@ -80,15 +82,36 @@ public class Grocery implements Serializable {
         this.isincart = isincart;
     }
 
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
     public Grocery(int id,
                    String name,
                    boolean isonshoppinglist,
-                   boolean isincart) {
+                   boolean isincart,
+                   float latitude,
+                   float longitude) {
         this.id = id;
         this.name = name;
         this.isonshoppinglist = isonshoppinglist;
         this.isincart = isincart;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
+
 
     public void setControlText(int controlId, String value) {
         Log.d("Grocery", "setControlText: " + value);

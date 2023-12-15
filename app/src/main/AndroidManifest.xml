@@ -41,6 +41,8 @@
             android:name=".GroceryEditActivity"
             android:exported="false">
         </activity>
+        <meta-data android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyD318ZyVSBshcAkp0EUKyafQj04tIgyTMw"/>
     </application>
 
 </manifest>

@@ -145,8 +145,8 @@ public class GroceryMapActivity extends AppCompatActivity implements OnMapReadyC
 
             if(currentGrocery != null)
             {
-                currentGrocery.setLatitude(addresses.get(0).getLatitude());
-                currentGrocery.setLongitude(addresses.get(0).getLongitude());
+                currentGrocery.setLatitude((float) addresses.get(0).getLatitude());
+                currentGrocery.setLongitude((float) addresses.get(0).getLongitude());
             }
 
 

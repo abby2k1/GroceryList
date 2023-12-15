@@ -15,6 +15,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
@@ -44,8 +45,11 @@ public class RestClient {
                                 JSONObject item = items.getJSONObject(i);
                                 Grocery grocery = new Grocery();
                                 grocery.setId(item.getInt("id"));
-                                grocery.setName(item.getString("description"));
+                                grocery.setName(item.getString("item"));
+                                grocery.setIsOnShoppingList(item.getBoolean("isOnShoppingList"));
                                 grocery.setIsInCart(item.getBoolean("isInCart"));
+                                grocery.setLatitude(item.getDouble("latitude"));
+                                grocery.setLongitude(item.getDouble("longitude"));
 
                                 String jsonPhoto = item.getString("photo");
 
@@ -70,7 +74,65 @@ public class RestClient {
                         Log.e(TAG, "execGetRequest: Error: " + error.getMessage());
                         //volleyCallback.onSuccess(grocerys);
                     });
-                    requestQueue.add(stringRequest);
+            requestQueue.add(stringRequest);
+        } catch (Exception e) {
+            throw e;
+            //Log.e(TAG, "execGetRequest: Exception: " + e.getMessage());
+        }
+    }
+
+    public static void execGetShoppingRequest(String url,
+                                      Context context,
+                                      VolleyCallback volleyCallback)
+    {
+        Log.d(TAG, "execGetRequest: Start: " + url);
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
+        ArrayList<Grocery> grocerys = new ArrayList<>();
+
+        try{
+            StringRequest stringRequest = new StringRequest(
+                    Request.Method.GET,
+                    url,
+                    response -> {
+                        Log.d(TAG, "execGetRequest: response: " + response);
+                        try {
+                            JSONArray items = new JSONArray(response);
+                            for (int i = 0; i < items.length(); i++) {
+                                JSONObject item = items.getJSONObject(i);
+                                Grocery grocery = new Grocery();
+                                grocery.setId(item.getInt("id"));
+                                grocery.setName(item.getString("item"));
+                                grocery.setIsOnShoppingList(item.getBoolean("isOnShoppingList"));
+                                grocery.setIsInCart(item.getBoolean("isInCart"));
+                                grocery.setLatitude(item.getDouble("latitude"));
+                                grocery.setLongitude(item.getDouble("longitude"));
+
+                                String jsonPhoto = item.getString("photo");
+
+                                if(jsonPhoto != null)
+                                {
+                                    byte[] bytePhoto = null;
+                                    bytePhoto = Base64.decode(jsonPhoto, Base64.DEFAULT);
+                                    Bitmap bmp = BitmapFactory.decodeByteArray(bytePhoto, 0, bytePhoto.length);
+                                    grocery.setPhoto(bmp);
+                                }
+
+                                if (grocery.getIsOnShoppingList()) {
+                                    grocerys.add(grocery);
+                                }
+                            }
+                        }
+                        catch (Exception e) {
+                            Log.e(TAG, "execGetRequest: Exception: " + e.getMessage());
+                        }
+
+                        volleyCallback.onSuccess(grocerys);
+                    },
+                    error -> {
+                        Log.e(TAG, "execGetRequest: Error: " + error.getMessage());
+                        //volleyCallback.onSuccess(grocerys);
+                    });
+            requestQueue.add(stringRequest);
         } catch (Exception e) {
             throw e;
             //Log.e(TAG, "execGetRequest: Exception: " + e.getMessage());
@@ -126,9 +188,12 @@ public class RestClient {
             JSONObject object = new JSONObject();
 
             object.put("id", grocery.getId());
-            object.put("name", grocery.getName());
+            object.put("item", grocery.getName());
             object.put("isOnShoppingList", grocery.getIsOnShoppingList());
             object.put("isInCart", grocery.getIsInCart());
+            object.put("owner", "abigailt");
+            object.put("latitude", grocery.getLatitude());
+            object.put("longitude", grocery.getLongitude());
 
             if(grocery.getPhoto() != null)
             {
@@ -148,11 +213,19 @@ public class RestClient {
             Log.d(TAG, "executeRequest: " + requestBody);
 
             JsonObjectRequest request = new JsonObjectRequest(method, url, object,
-                    response -> {
-                        Log.d(TAG, "onResponse: " + response);
-                        // ALSO SUPER IMPORTANT
-                        volleyCallback.onSuccess(new ArrayList<Grocery>());
-                    }, error -> Log.d(TAG, "onErrorResponse: " + error.getMessage()))
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.d(TAG, "onResponse: " + response);
+                            // ALSO SUPER IMPORTANT
+                            volleyCallback.onSuccess(new ArrayList<Grocery>());
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d(TAG, "onErrorResponse: " + error.getMessage());
+                }
+            })
             {
                 @Override
                 public byte[] getBody(){
@@ -180,37 +253,46 @@ public class RestClient {
         try {
             StringRequest stringRequest = new StringRequest(Request.Method.GET,
                     url,
-                    response -> {
-                        Log.d(TAG, "onResponse: " + response);
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.d(TAG, "onResponse: " + response);
 
-                        try {
-                            JSONObject object = new JSONObject(response);
-                            Grocery grocery = new Grocery();
-                            grocery.setId(object.getInt("id"));
-                            grocery.setName(object.getString("name"));
-                            grocery.setIsOnShoppingList(object.getBoolean("isOnShoppingList"));
-                            grocery.setIsInCart(object.getBoolean("isInCart"));
+                            try {
+                                JSONObject object = new JSONObject(response);
+                                Grocery grocery = new Grocery();
+                                grocery.setId(object.getInt("id"));
+                                grocery.setName(object.getString("name"));
+                                grocery.setIsOnShoppingList(object.getBoolean("isOnShoppingList"));
+                                grocery.setIsInCart(object.getBoolean("isInCart"));
 
-                            String jsonPhoto = object.getString("photo");
+                                grocery.setLatitude(object.getDouble("latitude"));
+                                grocery.setLongitude(object.getDouble("longitude"));
 
-                            if(jsonPhoto != null)
-                            {
-                                byte[] bytePhoto = null;
-                                bytePhoto = Base64.decode(jsonPhoto, Base64.DEFAULT);
-                                Bitmap bmp = BitmapFactory.decodeByteArray(bytePhoto, 0, bytePhoto.length);
-                                grocery.setPhoto(bmp);
+                                String jsonPhoto = object.getString("photo");
+
+                                if(jsonPhoto != null)
+                                {
+                                    byte[] bytePhoto = null;
+                                    bytePhoto = Base64.decode(jsonPhoto, Base64.DEFAULT);
+                                    Bitmap bmp = BitmapFactory.decodeByteArray(bytePhoto, 0, bytePhoto.length);
+                                    grocery.setPhoto(bmp);
+                                }
+
+                                grocerys.add(grocery);
+
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
                             }
-
-                            grocerys.add(grocery);
-
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
+                            volleyCallback.onSuccess(grocerys);
                         }
-                        volleyCallback.onSuccess(grocerys);
                     },
-                    error -> {
-                        Log.d(TAG, "onErrorResponse: ");
-                        Log.d(TAG, "onErrorResponse: " + error.getMessage());
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.d(TAG, "onErrorResponse: ");
+                            Log.d(TAG, "onErrorResponse: " + error.getMessage());
+                        }
                     });
 
             // Important!!!

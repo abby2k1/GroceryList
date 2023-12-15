@@ -38,4 +38,8 @@
     <string name="latitude">Latitude:</string>
     <string name="longitude">Longitude:</string>
     <string name="geo">Geo</string>
+    <string name="master_list">Master List</string>
+    <string name="shopping_list">Shopping List</string>
+    <string name="clear_all">Clear All</string>
+    <string name="delete_checked">Delete Checked</string>
 </resources>

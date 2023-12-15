@@ -7,6 +7,8 @@ import android.content.IntentFilter;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -22,11 +24,12 @@ import java.util.Comparator;
 
 public class GroceryListActivity extends AppCompatActivity {
     public static final String TAG = "GroceryListActivity";
-    public static final String TEAMSAPI = "https://fvtcdp.azurewebsites.net/api/grocery/";
+    public static final String TEAMSAPI = "https://fvtcdp.azurewebsites.net/api/GroceryList/";
     public static final String FILENAME = "grocerys.txt";
     ArrayList<Grocery> grocerys;
     RecyclerView groceryList;
     GroceryAdapter groceryAdapter;
+    GroceryAdapterMaster groceryAdapterMaster;
 
     // String Sorters
     Comparator<Grocery> nameComparator = (c1, c2) -> c1.getName().compareTo(c2.getName());
@@ -50,19 +53,137 @@ public class GroceryListActivity extends AppCompatActivity {
         int position = viewHolder.getAdapterPosition();
         int id = grocerys.get(position).getId();
         Grocery grocery = grocerys.get(position);
-        grocerys.get(position).setIsInCart(b);
-        Log.d(TAG, "onCheckedChanged: " + grocerys.get(position).getName());
 
-        // grocery.setIsInCart(b);
+        String listMode = getSharedPreferences("groceryspreferences",
+                Context.MODE_PRIVATE)
+                .getString("listselected", "shoppinglist");
 
-        RestClient.execPutRequest(grocerys.get(position), TEAMSAPI + id, this,
-                VolleyCallback -> {
-                    Log.d(TAG, "onSuccess: " + VolleyCallback);
-                    //grocerys.set(position, VolleyCallback);
-                    groceryAdapter.notifyDataSetChanged();
-                    RebindScreen();
-                });
+        if (!listMode.equals("masterlist")) {
+            grocerys.get(position).setIsInCart(b);
+            Log.d(TAG, "onCheckedChanged: " + grocerys.get(position).getName());
+
+            // grocery.setIsInCart(b);
+
+            RestClient.execPutRequest(grocerys.get(position), TEAMSAPI + id, this,
+                    VolleyCallback -> {
+                        Log.d(TAG, "onSuccess: " + VolleyCallback);
+                        //grocerys.set(position, VolleyCallback);
+                        groceryAdapter.notifyDataSetChanged();
+                        RebindScreen();
+                    });
+        } else if (listMode.equals("masterlist")) {
+            grocerys.get(position).setIsOnShoppingList(b);
+            Log.d(TAG, "onCheckedChanged: " + grocerys.get(position).getName());
+
+            // grocery.setIsInCart(b);
+
+            RestClient.execPutRequest(grocerys.get(position), TEAMSAPI + id, this,
+                    VolleyCallback -> {
+                        Log.d(TAG, "onSuccess: " + VolleyCallback);
+                        //grocerys.set(position, VolleyCallback);
+                        groceryAdapterMaster.notifyDataSetChanged();
+                        RebindScreen();
+                    });
+        }
+
     };
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        Log.d(TAG, "onOptionsItemSelected: " + (String)item.getTitle());
+
+        if (id == R.id.masterlist) {
+            Log.i(TAG, "onOptionsItemSelected: " + R.id.masterlist);
+            getSharedPreferences("groceryspreferences",
+                    Context.MODE_PRIVATE)
+                    .edit()
+                    .putString("listselected", "masterlist")
+                    .apply();
+            Context fromActivity = GroceryListActivity.this;
+            Class<?> destinationActivityClass = GroceryListActivity.class;
+            Intent intent = new Intent(fromActivity, destinationActivityClass);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            fromActivity.startActivity(intent);
+            return true;
+        } else if (id == R.id.shoppinglist) {
+            Log.i(TAG, "onOptionsItemSelected: " + R.id.shoppinglist);
+            getSharedPreferences("groceryspreferences",
+                    Context.MODE_PRIVATE)
+                    .edit()
+                    .putString("listselected", "shoppinglist")
+                    .apply();
+            Context fromActivity = GroceryListActivity.this;
+            Class<?> destinationActivityClass = GroceryListActivity.class;
+            Intent intent = new Intent(fromActivity, destinationActivityClass);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            fromActivity.startActivity(intent);
+            return true;
+        } else if (id == R.id.clearall) {
+            Log.i(TAG, "onOptionsItemSelected: " + R.id.clearall);
+            String listMode = getSharedPreferences("groceryspreferences",
+                    Context.MODE_PRIVATE)
+                    .getString("listselected", "shoppinglist");
+            for ( Grocery grocery : grocerys ) {
+                if (listMode.equals("masterlist"))
+                {
+                    grocery.setIsOnShoppingList(false);
+                }
+                grocery.setIsInCart(false);
+                RestClient.execPutRequest(grocery, TEAMSAPI + grocery.getId(), this,
+                        VolleyCallback -> {
+                            Log.d(TAG, "onSuccess: " + VolleyCallback);
+                            //grocerys.set(position, VolleyCallback);
+                            if (listMode.equals("masterlist"))
+                            {
+                                groceryAdapterMaster.notifyDataSetChanged();
+                            }
+                            else if (!listMode.equals("masterlist"))
+                            {
+                                groceryAdapter.notifyDataSetChanged();
+                            }
+                            RebindScreen();
+                        });
+            }
+        } else {
+            Log.i(TAG, "onOptionsItemSelected: " + R.id.deletechecked);
+            String listMode = getSharedPreferences("groceryspreferences",
+                    Context.MODE_PRIVATE)
+                    .getString("listselected", "shoppinglist");
+            for ( Grocery grocery : grocerys ) {
+                if (!listMode.equals("masterlist"))
+                {
+                    grocery.setIsOnShoppingList(false);
+                    grocery.setIsInCart(false);
+                    RestClient.execPutRequest(grocery, TEAMSAPI + grocery.getId(), this,
+                            VolleyCallback -> {
+                                Log.d(TAG, "onSuccess: " + VolleyCallback);
+                                //grocerys.set(position, VolleyCallback);
+                                groceryAdapter.notifyDataSetChanged();
+                                RebindScreen();
+                            });
+                }
+                else if (listMode.equals("masterlist"))
+                {
+                    RestClient.execDeleteRequest(grocery, TEAMSAPI + grocery.getId(), this,
+                            VolleyCallback -> {
+                                Log.d(TAG, "onSuccess: " + VolleyCallback);
+                                //grocerys.set(position, VolleyCallback);
+                                groceryAdapterMaster.notifyDataSetChanged();
+                                RebindScreen();
+                            });
+                }
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,23 +241,55 @@ public class GroceryListActivity extends AppCompatActivity {
 
     private void readFromAPI()
     {
-        try {
-            Log.d(TAG, "readFromAPI: Start");
-
-            RestClient.execGetRequest(TEAMSAPI, this,
-                VolleyCallback -> {
-                    Log.d(TAG, "onSuccess: " + VolleyCallback.size());
-                    grocerys = VolleyCallback;
-                    for (Grocery t : grocerys) {
-                        Log.d(TAG, "onSuccess: " + t.getName());
-                    }
-                    RebindScreen();
-                    //groceryAdapter.notifyDataSetChanged();
-                });
-        }
-        catch(Exception e)
+        String listMode = getSharedPreferences("groceryspreferences",
+                Context.MODE_PRIVATE)
+                .getString("listselected", "shoppinglist");
+        if (!listMode.equals("masterlist"))
         {
-            Log.e(TAG, "readFromAPI: " + e.getMessage());
+            try {
+                Log.d(TAG, "readFromAPI: Start");
+
+                RestClient.execGetShoppingRequest(TEAMSAPI + "abigailt", this,
+                        VolleyCallback -> {
+                            Log.d(TAG, "onSuccess: " + VolleyCallback.size());
+                            grocerys = VolleyCallback;
+                            for (Grocery t : grocerys) {
+                                Log.d(TAG, "onSuccess: " + t.getName());
+                            }
+
+                            RebindScreen();
+                            //groceryAdapter.notifyDataSetChanged();
+                        });
+                RebindScreen();
+            }
+            catch(Exception e)
+            {
+                Log.e(TAG, "readFromAPI: " + e.getMessage());
+            }
+        }
+        else if (listMode.equals("masterlist"))
+        {
+            try {
+                Log.d(TAG, "readFromAPI: Start");
+
+                RestClient.execGetRequest(TEAMSAPI + "abigailt", this,
+                        VolleyCallback -> {
+                            Log.d(TAG, "onSuccess: " + VolleyCallback.size());
+                            grocerys = VolleyCallback;
+                            for (Grocery t : grocerys) {
+                                Log.d(TAG, "onSuccess: " + t.getName());
+
+                            }
+
+                            RebindScreen();
+                            //groceryAdapter.notifyDataSetChanged();
+                        });
+                RebindScreen();
+            }
+            catch(Exception e)
+            {
+                Log.e(TAG, "readFromAPI: " + e.getMessage());
+            }
         }
     }
 
@@ -156,12 +309,21 @@ public class GroceryListActivity extends AppCompatActivity {
     private void initDeleteButton() {
         Switch switchDelete = findViewById(R.id.switchDelete);
 
-        switchDelete.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                Log.d(TAG, "onCheckedChanged: " + b);
+        switchDelete.setOnCheckedChangeListener((compoundButton, b) -> {
+            Log.d(TAG, "onCheckedChanged: " + b);
+
+            String listMode = getSharedPreferences("groceryspreferences",
+                    Context.MODE_PRIVATE)
+                    .getString("listselected", "shoppinglist");
+            if (!listMode.equals("masterlist"))
+            {
                 groceryAdapter.setDelete(b);
                 groceryAdapter.notifyDataSetChanged();
+            }
+            else if (listMode.equals("masterlist"))
+            {
+                groceryAdapterMaster.setDelete(b);
+                groceryAdapterMaster.notifyDataSetChanged();
             }
         });
     }
@@ -226,12 +388,31 @@ public class GroceryListActivity extends AppCompatActivity {
         groceryList = findViewById(R.id.rvGrocerys);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         groceryList.setLayoutManager(layoutManager);
-        groceryAdapter = new GroceryAdapter(grocerys, this);
-        groceryAdapter.setOnItemClickListener(onClickListener);
-        groceryAdapter.setOnItemCheckedChangeListener(onCheckedChangeListener);
-        groceryList.setAdapter(groceryAdapter);
+        Log.d(TAG, "RebindScreen: " + "why the heck is no adapter attached outside if");
 
-        groceryAdapter.notifyDataSetChanged();
+        String listMode = getSharedPreferences("groceryspreferences",
+                Context.MODE_PRIVATE)
+                .getString("listselected", "shoppinglist");
+        if (!listMode.equals("masterlist"))
+        {
+            groceryAdapter = new GroceryAdapter(grocerys, this);
+            groceryAdapter.setOnItemClickListener(onClickListener);
+            groceryAdapter.setOnItemCheckedChangeListener(onCheckedChangeListener);
+            Log.d(TAG, "RebindScreen: " + "why the heck is no adapter attached");
+            groceryList.setAdapter(groceryAdapter);
+
+            groceryAdapter.notifyDataSetChanged();
+        }
+        else if (listMode.equals("masterlist"))
+        {
+            groceryAdapterMaster = new GroceryAdapterMaster(grocerys, this);
+            groceryAdapterMaster.setOnItemClickListener(onClickListener);
+            groceryAdapterMaster.setOnItemCheckedChangeListener(onCheckedChangeListener);
+            groceryList.setAdapter(groceryAdapterMaster);
+
+            groceryAdapterMaster.notifyDataSetChanged();
+        }
+
 
         Log.d(TAG, "RebindScreen: End: "+ grocerys.size());
     }

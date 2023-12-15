@@ -79,83 +79,13 @@
                 android:scaleType="fitCenter"
                 app:srcCompat="@drawable/photoicon" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/txtCity"
-                android:text="@string/city"
-                android:textSize="24dp"
-                android:layout_marginStart="16dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/etName"/>
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/etCity"
-                android:textSize="24dp"
-                android:layout_marginStart="16dp"
-                android:inputType="textPersonName"
-                android:hint="@string/enter_city"
-                app:layout_constraintTop_toBottomOf="@id/txtCity"
-                app:layout_constraintStart_toStartOf="parent"/>
-
-
-            <TextView
-                android:id="@+id/textCell"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:textSize="24dp"
-                android:text="@string/cell_phone"
-                app:layout_constraintStart_toStartOf="@+id/etCity"
-                app:layout_constraintTop_toBottomOf="@+id/etCity" />
-
-            <EditText
-                android:id="@+id/editCell"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ems="8"
-                android:textSize="24dp"
-                android:imeOptions="actionNext"
-                android:inputType="phone"
-                app:layout_constraintTop_toBottomOf="@id/textCell"
-                app:layout_constraintStart_toStartOf="@+id/textCell" />
-
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:id="@+id/ratingBar"
-                app:layout_constraintTop_toBottomOf="@id/editCell">
+                app:layout_constraintTop_toBottomOf="@id/imageGrocery">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/txtView_rating"
-                    android:text="@string/rating"
-                    android:layout_marginStart="16dp"
-                    android:textSize="24dp"
-                    android:textColor="@color/black" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/txtRating"
-                    android:layout_marginStart="16dp"
-                    android:textColor="@color/black"
-                    android:layout_weight="1"
-                    android:textSize="24dp"
-                    app:layout_constraintStart_toEndOf="@id/txtView_rating"/>
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/btnRating"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"
-                    app:layout_constraintStart_toEndOf="@id/txtRating"
-                    android:text="@string/rate">
-                </Button>
                 <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -163,7 +93,7 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="8dp"
                     android:text="@string/geo"
-                    app:layout_constraintStart_toEndOf="@id/btnRating">
+                    app:layout_constraintStart_toStartOf="parent">
                 </Button>
 
             </androidx.appcompat.widget.LinearLayoutCompat>
