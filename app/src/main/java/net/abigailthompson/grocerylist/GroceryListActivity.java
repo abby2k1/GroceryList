@@ -161,6 +161,7 @@ public class GroceryListActivity extends AppCompatActivity {
             for ( Grocery grocery : grocerys ) {
                 if (!listMode.equals("masterlist"))
                 {
+                    if (!grocery.getIsInCart()) continue;
                     grocery.setIsOnShoppingList(false);
                     grocery.setIsInCart(false);
                     RestClient.execPutRequest(grocery, TEAMSAPI + grocery.getId(), this,
@@ -173,6 +174,7 @@ public class GroceryListActivity extends AppCompatActivity {
                 }
                 else if (listMode.equals("masterlist"))
                 {
+                    if (!grocery.getIsOnShoppingList()) continue;
                     RestClient.execDeleteRequest(grocery, TEAMSAPI + grocery.getId(), this,
                             VolleyCallback -> {
                                 Log.d(TAG, "onSuccess: " + VolleyCallback);
