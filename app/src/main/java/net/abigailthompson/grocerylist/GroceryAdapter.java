@@ -171,4 +171,3 @@ public class GroceryAdapter extends RecyclerView.Adapter {
         return GroceryData.size();
     }
 }
-
