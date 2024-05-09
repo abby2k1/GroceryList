@@ -42,7 +42,7 @@
             android:exported="false">
         </activity>
         <meta-data android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyD318ZyVSBshcAkp0EUKyafQj04tIgyTMw"/>
+            android:value="key is now disabled"/>
     </application>
 
 </manifest>
